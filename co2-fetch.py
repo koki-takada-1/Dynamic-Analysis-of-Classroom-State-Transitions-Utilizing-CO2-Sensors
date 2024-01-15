@@ -56,21 +56,21 @@ token = "qiHps8hYrRmYi2xDvjY_J-9SITntEE8qPeZjP504eSfJwajREbIaqZZHGe1TZJo2jJUK4vb
 infclient = InfluxDBClient(url=url, token=token, org=org, timeout=30000)
 query_api = infclient.query_api()
 
-query = 'from(bucket:"m5kkiput") |> range(start:-8d, stop:-0m) |> filter(fn: (r) => r["_measurement"] =~ /' + '|'.join(num_to_id.values()) + '/) |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value") |> keep(columns: ["_time", "_measurement", "co2", "humidity", "temperature"])'
-df = query_api.query_data_frame(query)
-for num, id in num_to_id.items():
-    df_id = df[df['_measurement'] == id]
-    df_id = df_id.drop(columns=['result', 'table'])
-    df_id.to_csv(f"{num}data.csv", encoding='utf-8-sig')
-# df = query_api.query_data_frame('''
-#     from(bucket:"m5kkiput")
-#         |> range(start:-8d, stop:-0m)
-#         |> filter(fn: (r) => r["_measurement"] == "08B7")
-#         |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value")
-#         |> keep(columns: ["_time", "_measurement", "co2", "humidity", "temperature"])
-#     ''')
+# query = 'from(bucket:"m5kkiput") |> range(start:-8d, stop:-0m) |> filter(fn: (r) => r["_measurement"] =~ /' + '|'.join(num_to_id.values()) + '/) |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value") |> keep(columns: ["_time", "_measurement", "co2", "humidity", "temperature"])'
+# df = query_api.query_data_frame(query)
+# for num, id in num_to_id.items():
+#     df_id = df[df['_measurement'] == id]
+#     df_id = df_id.drop(columns=['result', 'table'])
+#     df_id.to_csv(f"{num}data.csv", encoding='utf-8-sig')
+df = query_api.query_data_frame('''
+    from(bucket:"m5kkiput")
+        |> range(start:-3h, stop:-0m)
+        |> filter(fn: (r) => r["_measurement"] == "08B7")
+        |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value")
+        |> keep(columns: ["_time", "_measurement", "co2", "humidity", "temperature"])
+    ''')
 
-# df2 = df.drop(columns=['result', 'table'])
+df2 = df.drop(columns=['result', 'table'])
 
-# print(df2.to_string())
-# df2.to_csv("371data.csv", encoding='utf-8-sig')
+print(df2.to_string())
+df2.to_csv("2024-0110-371data.csv", encoding='utf-8-sig')
